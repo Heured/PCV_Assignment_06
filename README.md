@@ -27,15 +27,17 @@ chessboard Square
   3.从世界坐标系到相机坐标系3D->3D  
   ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理3.png)
   
-  4.  ![emmmm]()
+  4.  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理3_1.png)
   
   5. 其中，R为旋转矩阵，t为平移向量，因为假定在世界坐标系中物点所在平面过世界坐标系原点且与Zw轴垂直（也即棋盘平面与Xw-Yw平面重合，目的在于方便后续计算），所以zw=0，可直接转换成式1的形式。其中变换矩阵
   
-  6.  
+  6.  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理3_2.png)
   
   7. 即为前文提到的外参矩阵，之所称之为外参矩阵可以理解为只与相机外部参数有关，且外参矩阵随刚体位置的变化而变化。
   
   8. 从相机坐标系到理想图像坐标系（不考虑畸变） 3D->2D  
-  ![emmmm]()
+  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理4.png)
   
-  9.
+  9.  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理5.png)
+  
+  
