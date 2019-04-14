@@ -79,4 +79,88 @@ chessboard Square
   
   ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理10.png)
   
+## 实现方法
+  棋盘是一块由黑白方块间隔组成的标定板，我们用它来作为相机标定的标定物（从真实世界映射到数字图像内的对象）。之所以我们用棋盘作为标定物是因为平面棋盘模式更容易处理（相对于复杂的三维物体），但与此同时，二维物体相对于三维物体会缺少一部分信息，于是我们会多次改变棋盘的方位来捕捉图像，以求获得更丰富的坐标信息。  
+
+  下面将依次对刚体进行一系列变换，使之从世界坐标系进行仿射变换、投影透射，最终得到像素坐标系下的离散图像点，过程中会逐步引入各参数矩阵。
+  
+  标定图片需要使用标定板在不同位置、不同角度、不同姿态下拍摄，最少需要3张，以10~20张为宜。标定板需要是黑白相间的矩形构成的棋盘图，制作精度要求较高，如下图所示：  
+  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/棋盘.png)
+  
+  原图为：
+  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原图.PNG)
+  
+  拍摄设备参数： 焦距3.5mm、光圈F/2.2
+  
+  代码如下:  
+  ```python
+  # -*- coding: utf-8 -*-
+import cv2
+import numpy as np
+import glob
+
+# 设置寻找亚像素角点的参数，采用的停止准则是最大循环次数30和最大误差容限0.001
+criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 30, 0.001)
+
+# 获取标定板角点的位置
+objp = np.zeros((4*6, 3), np.float32)
+objp[:, :2] = np.mgrid[0:6, 0:4].T.reshape(-1, 2)  # 将世界坐标系建在标定板上，所有点的Z坐标全部为0，所以只需要赋值x和y
+
+obj_points = []  # 存储3D点
+img_points = []  # 存储2D点
+
+images = glob.glob("./data/*.jpg")
+i = 0;
+for fname in images:
+    img = cv2.imread(fname)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    size = gray.shape[::-1]
+    ret, corners = cv2.findChessboardCorners(gray, (6, 4), None)
+    #print(corners)
+
+    if ret:
+
+        obj_points.append(objp)
+
+        corners2 = cv2.cornerSubPix(gray, corners, (5, 5), (-1, -1), criteria)  # 在原角点的基础上寻找亚像素角点
+        #print(corners2)
+        if [corners2]:
+            img_points.append(corners2)
+        else:
+            img_points.append(corners)
+
+        cv2.drawChessboardCorners(img, (6, 4), corners, ret)  # 记住，OpenCV的绘制函数一般无返回值
+        i += 1;
+        cv2.imwrite('conimg'+str(i)+'.jpg', img)
+        cv2.waitKey(4000)
+
+print(len(img_points))
+cv2.destroyAllWindows()
+
+# 标定
+ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(obj_points, img_points, size, None, None)
+
+print("ret:", ret)
+print("mtx:\n", mtx) # 内参数矩阵
+print("dist:\n", dist)  # 畸变系数   distortion cofficients = (k_1,k_2,p_1,p_2,k_3)
+print("rvecs:\n", rvecs)  # 旋转向量  # 外参数
+print("tvecs:\n", tvecs ) # 平移向量  # 外参数
+
+print("-----------------------------------------------------")
+
+img = cv2.imread(images[2])
+h, w = img.shape[:2]
+newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx,dist,(w,h),1,(w,h))#显示更大范围的图片（正常重映射之后会删掉一部分图像）
+print(newcameramtx)
+print("------------------使用undistort函数-------------------")
+dst = cv2.undistort(img,mtx,dist,None,newcameramtx)
+x, y, w, h = roi
+dst1 = dst[y:y+h, x:x+w]
+cv2.imwrite('calibresult3.jpg', dst1)
+print("方法一:dst的大小为:", dst1.shape)
+  ```
+  
+结果：  
+
+  
   
