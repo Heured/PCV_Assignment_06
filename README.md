@@ -9,7 +9,7 @@ chessboard Square
   
   畸变系数：包括相机的径向畸变参数k1，k2，k3，...，和相机的切向畸变参数p1，p2，...。
   
-  4.
+  4.![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理.png)
   
 ## 相机标定原理
 
