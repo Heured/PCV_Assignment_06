@@ -40,4 +40,43 @@ chessboard Square
   
   9.  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理5.png)
   
+  10. 这一过程进行了从三维坐标到二维坐标的转换，也即投影透视过程（用中心投影法将形体投射到投影面上，从而获得的一种较为接近视觉效果的单面投影图，也就是使我们人眼看到景物近大远小的一种成像方式）。
+  
+  11. 从理想图像坐标系到实际图像坐标系（考虑畸变）：  
+  透镜的畸变主要分为径向畸变和切向畸变（还有薄透镜畸变等等，但都没有径向和切向畸变影响显著，所以我们在这里只考虑径向和切向畸变）。  
+  径向畸变是由于透镜形状的制造工艺导致。且越向透镜边缘移动径向畸变越严重。实际情况中我们常用r=0处的泰勒级数展开的前几项来近似描述径向畸变。矫正径向畸变前后的坐标关系为：  
+  xcorrected = x(1+k1r2+k2r4+k3r6)
+  ycorrected = y(1+k1r2+k2r4+k3r6)
+    
+  由此可知对于径向畸变，我们有3个畸变参数需要求解。
+  切向畸变是由于透镜和CMOS或者CCD的安装位置误差导致。切向畸变需要两个额外的畸变参数来描述，矫正前后的坐标关系为：  
+  
+  xcorrected = x + [ 2p1y + p2 (r2 + 2x2) ]
+  ycorrected = y + [ 2p2x + p1 (r2 + 2y2) ]
+  
+  由此可知对于切向畸变，我们有2个畸变参数需要求解。  
+  综上，我们一共需要5个畸变参数（k1、k2、k3、p1和p2 ）来描述透镜畸变。
+  
+  注意：  
+  从实际图像坐标系到像素坐标系：  
+  
+  由于定义的像素坐标系原点与图像坐标系原点不重合，假设像素坐标系原点在图像坐标系下的坐标为（u0，v0），每个像素点在图像坐标系x轴、y轴方向的尺寸为：dx、dy，且像点在实际图像坐标系下的坐标为（xc，yc），于是可得到像点在像素坐标系下的坐标为：  
+  
+  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理6.png)
+  
+  化为齐次坐标表示形式可得：  
+  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理7.png)
+  
+  若暂不考虑透镜畸变，则将式2与式5的转换矩阵相乘即为内参矩阵M：  
+  
+  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理8.png)
+  
+  之所以称之为内参矩阵可以理解为矩阵内各值只与相机内部参数有关，且不随物体位置变化而变化。 
+  
+  最后用一幅图来总结从世界坐标系到像素坐标系（不考虑畸变）的转换关系：  
+  
+  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理9.png)
+  
+  ![emmmm](https://github.com/Heured/PCV_Assignment_06/blob/master/imgToShow/原理10.png)
+  
   
